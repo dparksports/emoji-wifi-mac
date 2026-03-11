@@ -2,7 +2,7 @@
 
 EmojiWifi is a fun, streamlined macOS menu bar & window application to instantly generate WiFi names (SSIDs) and passwords strictly based on Emojis!
 
-## ✨ Features (v2.0)
+## ✨ Features (v2.1.0)
 
 - **Pure Emoji Generation**: Go wild with WiFi names made from a variety of emoji combinations, single emojis, or strictly randomly assembled strings!
 - **Persistent History**: The app remembers all your generated combinations and scanned codes. 
@@ -12,7 +12,7 @@ EmojiWifi is a fun, streamlined macOS menu bar & window application to instantly
 
 ## ⬇️ Download & Install
 
-**[Download EmojiWifi v2.0 here](https://github.com/dparksports/emoji-wifi-mac/releases/download/v2.0.0/EmojiWifi.zip)**
+**[Download EmojiWifi v2.1.0 here](https://github.com/dparksports/emoji-wifi-mac/releases/download/v2.1.0/EmojiWifi.zip)**
 
 1. Download the `EmojiWifi.zip` file from the link above.
 2. Double click to extract it.

@@ -1905,9 +1905,20 @@ struct QRCodeView: View {
     }
 }
 
+// MARK: - AppDelegate
+class AppDelegate: NSObject, NSApplicationDelegate {
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        // Force the app to be a regular app with Dock icon + App Switcher presence
+        NSApplication.shared.setActivationPolicy(.regular)
+        NSApplication.shared.activate(ignoringOtherApps: true)
+    }
+}
+
 // MARK: - App (MODIFIED)
 @main
 struct EmojiWifiApp: App {
+    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+
     init() {
         // Load the data from the embedded CSV files into the app's memory.
         // This will now use the data from the embedded resources on every launch.
