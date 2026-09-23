@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="880" height="600" viewBox="0 0 880 600" role="img" aria-label="EmojiWifi features: emoji name generator, password generator, QR codes, scanning, auto join, history">
+  <style>
+    .t { font-family: -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+    .title { font-size: 16.5px; font-weight: 650; fill: #111827; }
+    .desc { font-size: 12.5px; fill: #6b7280; }
+    .emoji { font-size: 24px; }
+    .card { fill: #fbfbfc; stroke: #e5e7eb; stroke-width: 1.5; }
+  </style>
+  <rect x="1" y="1" width="878" height="598" rx="18" fill="#ffffff" stroke="#e5e7eb" stroke-width="1.5"/>
+
+  <rect x="32" y="32" width="256" height="256" rx="16" class="card"/>
+  <circle cx="88" cy="84" r="26" fill="#0A84FF" fill-opacity="0.12"/>
+  <text x="88" y="92" text-anchor="middle" class="t emoji">🎨</text>
+  <text x="160" y="144" text-anchor="middle" class="t title">Emoji Name Generator</text>
+  <text x="160" y="172" text-anchor="middle" class="t desc">Curated combinations, single emojis,</text>
+  <text x="160" y="191" text-anchor="middle" class="t desc">or random-length strings — with a</text>
+  <text x="160" y="210" text-anchor="middle" class="t desc">searchable library of 70 combos</text>
+  <text x="160" y="229" text-anchor="middle" class="t desc">and 530+ emojis built in.</text>
+
+  <rect x="312" y="32" width="256" height="256" rx="16" class="card"/>
+  <circle cx="368" cy="84" r="26" fill="#FF9500" fill-opacity="0.12"/>
+  <text x="368" y="92" text-anchor="middle" class="t emoji">🔐</text>
+  <text x="440" y="144" text-anchor="middle" class="t title">Password Generator</text>
+  <text x="440" y="172" text-anchor="middle" class="t desc">8–63 characters with A-Z, a-z, 0-9</text>
+  <text x="440" y="191" text-anchor="middle" class="t desc">and !@# toggles — regenerated</text>
+  <text x="440" y="210" text-anchor="middle" class="t desc">live as you tune it.</text>
+
+  <rect x="592" y="32" width="256" height="256" rx="16" class="card"/>
+  <circle cx="648" cy="84" r="26" fill="#AF52DE" fill-opacity="0.12"/>
+  <text x="648" y="92" text-anchor="middle" class="t emoji">📱</text>
+  <text x="720" y="144" text-anchor="middle" class="t title">Instant QR Codes</text>
+  <text x="720" y="172" text-anchor="middle" class="t desc">Every network gets a scannable</text>
+  <text x="720" y="191" text-anchor="middle" class="t desc">WPA QR code you can copy or</text>
+  <text x="720" y="210" text-anchor="middle" class="t desc">share in one click.</text>
+
+  <rect x="32" y="312" width="256" height="256" rx="16" class="card"/>
+  <circle cx="88" cy="364" r="26" fill="#34C759" fill-opacity="0.12"/>
+  <text x="88" y="372" text-anchor="middle" class="t emoji">📷</text>
+  <text x="160" y="424" text-anchor="middle" class="t title">Two Ways to Scan</text>
+  <text x="160" y="452" text-anchor="middle" class="t desc">Join an existing network from a</text>
+  <text x="160" y="471" text-anchor="middle" class="t desc">live camera scan or an imported</text>
+  <text x="160" y="490" text-anchor="middle" class="t desc">image — QR parsed on-device.</text>
+
+  <rect x="312" y="312" width="256" height="256" rx="16" class="card"/>
+  <circle cx="368" cy="364" r="26" fill="#FF2D55" fill-opacity="0.12"/>
+  <text x="368" y="372" text-anchor="middle" class="t emoji">🚀</text>
+  <text x="440" y="424" text-anchor="middle" class="t title">Auto Join</text>
+  <text x="440" y="452" text-anchor="middle" class="t desc">One click connects your Mac via</text>
+  <text x="440" y="471" text-anchor="middle" class="t desc">networksetup — no digging</text>
+  <text x="440" y="490" text-anchor="middle" class="t desc">through System Settings.</text>
+
+  <rect x="592" y="312" width="256" height="256" rx="16" class="card"/>
+  <circle cx="648" cy="364" r="26" fill="#5AC8FA" fill-opacity="0.16"/>
+  <text x="648" y="372" text-anchor="middle" class="t emoji">🕘</text>
+  <text x="720" y="424" text-anchor="middle" class="t title">Persistent History</text>
+  <text x="720" y="452" text-anchor="middle" class="t desc">Generated, scanned and imported</text>
+  <text x="720" y="471" text-anchor="middle" class="t desc">networks saved locally as JSON —</text>
+  <text x="720" y="490" text-anchor="middle" class="t desc">reuse, copy or delete anytime.</text>
+</svg>
