@@ -5,6 +5,14 @@ APP_NAME="EmojiWifi"
 BUILD_DIR=".build/release"
 APP_DIR="${APP_NAME}.app"
 
+# CLT 27.0's macOS 27 SDK implements SwiftUI's @State etc. as macros, but the
+# CLT (unlike full Xcode) doesn't ship the SwiftUIMacros plugin, so SwiftUI
+# fails to compile against it. Build against the last SDK that still uses
+# plain property wrappers. Remove this once CLT ships the macro plugin.
+if [ -z "$SDKROOT" ] && [ -d "/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk" ]; then
+    export SDKROOT="/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk"
+fi
+
 echo "🔨 Building ${APP_NAME}..."
 swift build -c release 2>&1
 
