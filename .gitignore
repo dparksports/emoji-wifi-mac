@@ -6,3 +6,7 @@ xcuserdata/
 DerivedData/
 EmojiWifi.app/
 EmojiWifi.zip
+EmojiWifi.zip.sha256
+EmojiWifi.dmg
+EmojiWifi.dmg.sha256
+*.swiftpm
