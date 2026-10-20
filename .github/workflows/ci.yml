@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    name: Tests (macOS)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run unit tests
+        run: swift test
+
+  build:
+    name: Build app bundle
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build release app bundle
+        run: ./build-app.sh
+
+      - name: Verify bundle contents
+        run: |
+          test -x EmojiWifi.app/Contents/MacOS/EmojiWifi
+          test -f EmojiWifi.app/Contents/Resources/EmojiWifi_EmojiWifi.bundle/EmojiCatalog.json
+          test -f EmojiWifi.app/Contents/Resources/EmojiWifi.icns
+          codesign --verify --deep --strict EmojiWifi.app
+
+      - name: Zip bundle for artifact
+        run: ditto -c -k --keepParent EmojiWifi.app EmojiWifi-ci.zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: EmojiWifi.app
+          path: EmojiWifi-ci.zip
+          retention-days: 14

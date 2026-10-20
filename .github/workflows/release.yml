@@ -1,0 +1,43 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+jobs:
+  release:
+    name: Build & attach DMG + zip
+    runs-on: macos-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run tests
+        run: swift test
+
+      - name: Build release app bundle
+        run: ./build-app.sh
+
+      - name: Package DMG and zip with checksums
+        run: |
+          ditto -c -k --keepParent EmojiWifi.app EmojiWifi.zip
+          shasum -a 256 EmojiWifi.zip > EmojiWifi.zip.sha256
+          hdiutil create -volname EmojiWifi -srcfolder EmojiWifi.app -ov -format UDZO EmojiWifi.dmg -quiet
+          shasum -a 256 EmojiWifi.dmg > EmojiWifi.dmg.sha256
+
+      - name: Attach to GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            EmojiWifi.zip
+            EmojiWifi.zip.sha256
+            EmojiWifi.dmg
+            EmojiWifi.dmg.sha256
+          generate_release_notes: true
+
+  # Notarization is on the roadmap. When an Apple Developer ID certificate is
+  # available, add secrets (APPLE_API_KEY etc.) and a notarytool step here:
+  #   xcrun notarytool submit EmojiWifi.dmg --key ... --wait
+  #   xcrun stapler staple EmojiWifi.app

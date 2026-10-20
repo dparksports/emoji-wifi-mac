@@ -1,0 +1,27 @@
+name: Feature request
+description: Suggest an idea for EmojiWifi
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do?
+      description: The situation or annoyance your idea would fix — "I always forget which emojis I've used" beats "add emoji search v2".
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: What would help?
+      description: Describe your idea. Screenshots or mockups welcome.
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Does this exist on the Windows version?
+      description: EmojiWifi also exists for Windows and Ubuntu — knowing what the siblings do helps us keep the family consistent.
+      options:
+        - "Yes, and it's nice there"
+        - "No"
+        - "Not sure"

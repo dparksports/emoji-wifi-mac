@@ -30,19 +30,29 @@ it into SSID and password instantly.
 
 <img src="docs/features.svg" alt="Feature grid: emoji name generator, password generator, instant QR codes, two ways to scan, auto join, persistent history" width="880"/>
 
-- **Three name styles** — curated emoji combinations (70 built in), single
-  emojis (a 533-emoji dataset with descriptions), or random-length strings.
-  Browse the full combination library in a searchable grid.
+- **1,364 emojis, zero repeats** — the full Unicode 14.0 catalog (the same
+  filtered set as the Windows app: no flags or skin-tone variants, which show
+  up as broken boxes on some devices), organized into 8 categories and
+  searchable by name. Type "pizza", meet 🍕 instantly.
+- **Emoji Picker that remembers** — emojis that appear in any of your past
+  network names are dimmed; one checkbox hides them entirely; and the
+  Generate button skips your greatest hits by default.
+- **Three name styles** — curated emoji combinations (70 built in, plus themed
+  combos auto-generated per category), single emojis, or random-length
+  strings, always within the 32-byte SSID limit every phone can display.
 - **Tunable passwords** — 8–63 characters with independent A-Z / a-z / 0-9 /
-  `!@#` toggles, regenerated live as you adjust.
+  `!@#` toggles, regenerated live as you adjust. Every selected character
+  class is guaranteed to appear.
 - **QR codes, both directions** — every generated network gets a WPA QR code
-  (error-correction level M), and the scanner accepts camera frames or
-  imported images via Apple's on-device QR detection.
+  with properly escaped `\ ; , : "` characters (strong passwords can't break
+  it), and the scanner accepts camera frames or imported images via Apple's
+  on-device QR detection.
 - **Auto Join** — one click runs `networksetup` to connect your Mac to the
-  generated or scanned network.
-- **Persistent history** — every generated, scanned, or imported network is
-  stored locally as JSON (`~/Library/Application Support/EmojiWifi/history.json`)
-  with reuse, copy, and delete actions.
+  generated or scanned network. (Windows can't do this — Mac-only.)
+- **Persistent history** — your last 50 generated, scanned, or imported
+  networks are stored locally as JSON
+  (`~/Library/Application Support/EmojiWifi/history.json`) with reuse, copy,
+  and delete actions.
 
 ## 🔄 How it works
 
@@ -58,11 +68,19 @@ EmojiWifi's scanner.
 
 ## ⬇️ Download & Install
 
-**[Download the latest EmojiWifi release](https://github.com/dparksports/emoji-wifi-mac/releases/latest/download/EmojiWifi.zip)**
+**[Download the latest EmojiWifi DMG](https://github.com/dparksports/emoji-wifi-mac/releases/latest/download/EmojiWifi.dmg)**
+(or the [zip](https://github.com/dparksports/emoji-wifi-mac/releases/latest/download/EmojiWifi.zip),
+with [SHA-256 checksums](https://github.com/dparksports/emoji-wifi-mac/releases/latest) for both)
 
-1. Download and extract `EmojiWifi.zip`.
-2. Drag `EmojiWifi.app` into your `/Applications` folder.
-3. Open it and start generating — the app is signed, so no Gatekeeper warnings.
+1. Open the DMG and drag `EmojiWifi.app` into your `/Applications` folder.
+2. **First launch — one honest note:** the app is *ad-hoc signed*, so macOS
+   will say it "can't be opened because Apple cannot check it for malicious
+   software." That's how macOS treats every app without a paid Apple
+   notarization ticket — our code is open, anyone can read it right here in
+   this repository. To open it: **System Settings → Privacy & Security →
+   Open Anyway** (on macOS 13/14: right-click the app → Open → Open). You
+   only do this once.
+3. Generate away. Notarization (which removes the notice) is on the roadmap.
 
 > The live camera scanner needs camera permission; macOS will ask on first use.
 
@@ -76,7 +94,8 @@ Built with SwiftUI and Swift Package Manager — no Xcode project required.
 ```bash
 git clone https://github.com/dparksports/emoji-wifi-mac.git
 cd emoji-wifi-mac
-./build-app.sh
+swift test          # run the unit tests
+./build-app.sh      # build + bundle + ad-hoc sign
 open EmojiWifi.app
 ```
 
@@ -96,14 +115,53 @@ emoji-wifi-mac/
 ├── Sources/EmojiWifi/
 │   ├── ContentView.swift      # App entry point, sidebar tabs, generate view
 │   ├── Views.swift            # Camera scanner, image import, UI components
-│   ├── EmojiGenerator.swift   # Emoji dataset loading & WiFi name generation
+│   ├── EmojiPickerView.swift  # Category/search picker with used-emoji dimming
+│   ├── EmojiGenerator.swift   # Catalog loading, name generation, used tracking
+│   ├── WiFiQRPayload.swift    # Escaped WIFI: QR payload build/parse
 │   ├── Models.swift           # Password gen, QR gen, WiFi joiner, history
-│   ├── single.csv             # 533 emoji → description dataset
+│   ├── EmojiCatalog.json      # 1,364 emoji (Unicode 14.0, filtered)
+│   ├── single.csv             # 533 emoji → description fallback dataset
 │   └── combos.csv             # 70 curated emoji combinations
-├── build-app.sh               # Build + bundle + sign script
+├── Tests/EmojiWifiTests/      # Payload escaping, passwords, catalog, history
+├── .github/workflows/         # CI (test + bundle check) and release (DMG + zip)
+├── build-app.sh               # Build + bundle + sign script (./build-app.sh --dmg for a DMG)
 ├── EmojiWifi.icns             # App icon
 └── docs/                      # Infographics used in this README
 ```
+
+The emoji catalog is generated from Unicode's official `emoji-test.txt` by
+`tools/generate_emoji_catalog.py` in the
+[Windows repo](https://github.com/dparksports/emoji-wifi-windows) — both apps
+share the exact same filtered catalog.
+
+## 🌍 The EmojiWifi family
+
+EmojiWifi exists on three platforms, kept consistent on purpose:
+
+| | 🍎 Mac | 🪟 [Windows](https://github.com/dparksports/emoji-wifi-windows) | 🐧 [Ubuntu](https://github.com/dparksports/emoji-wifi-ubuntu) |
+|---|---|---|---|
+| Emoji pool | 1,364 | 1,364 | smaller set |
+| Categories + search picker | ✅ | ✅ | — |
+| Used-emoji dimming / skip-used | ✅ | ✅ | — |
+| Themed combinations | ✅ | ✅ | — |
+| Strong passwords (8–63, class-guaranteed) | ✅ | ✅ | ✅ |
+| Escaped WiFi QR payloads | ✅ | ✅ | — |
+| Scan: image import | ✅ | ✅ | — |
+| Scan: live camera | ✅ | — | — |
+| **Auto Join network** | ✅ | — | — |
+| Offline, no telemetry | ✅ | ✅ | ✅ |
+| Install size | ~5 MB | ~70 MB | tiny |
+
+Bug reports and ideas welcome — see [SUPPORT.md](SUPPORT.md) for quick
+answers and [CHANGELOG.md](CHANGELOG.md) for what changed.
+
+## 🗺️ Roadmap
+
+- Apple notarization (removes the first-launch notice entirely)
+- Auto-updates (Sparkle)
+- Menu-bar mode
+- Save password to iCloud Keychain
+- Homebrew cask (`brew install --cask emoji-wifi`)
 
 ## 📜 License
 

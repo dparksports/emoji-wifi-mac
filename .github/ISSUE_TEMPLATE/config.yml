@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions & ideas
+    url: https://github.com/dparksports/emoji-wifi-mac/discussions
+    about: Ask anything — no bug report needed.
+  - name: EmojiWifi for Windows
+    url: https://github.com/dparksports/emoji-wifi-windows
+    about: The Windows sibling of this app.
+  - name: EmojiWifi for Ubuntu
+    url: https://github.com/dparksports/emoji-wifi-ubuntu
+    about: The terminal sibling of this app.

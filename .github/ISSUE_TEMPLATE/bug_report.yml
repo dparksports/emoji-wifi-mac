@@ -1,0 +1,47 @@
+name: Bug report
+description: Something in EmojiWifi is broken or behaves oddly
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report it! EmojiWifi is fully offline —
+        your WiFi names and passwords never leave your Mac, so please don't
+        paste real passwords into the issue.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect, and what happened instead?
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Environment
+      description: App version (sidebar, bottom), macOS version, chip (Apple Silicon / Intel), and how you installed it (DMG, zip, built from source).
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which part of the app?
+      options:
+        - Emoji Picker
+        - Generate (names / passwords)
+        - QR code
+        - Scan (import image)
+        - Scan (live camera)
+        - Join Network
+        - History
+        - Install / first launch
+        - Other
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I looked through the open issues and didn't find a duplicate.
+          required: true
