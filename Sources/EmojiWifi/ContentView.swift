@@ -22,9 +22,11 @@ struct ContentView: View {
     @State private var showPasswordOptions = false
     @State private var showCombinations = false
     @State private var scanMode: ScanMode = .importImage
+    @State private var skipUsedEmojis = true
     
     enum ViewTab: String, CaseIterable {
         case generate = "Generate"
+        case picker = "Emoji Picker"
         case scan = "Scan"
         case history = "History"
     }
@@ -85,7 +87,7 @@ struct ContentView: View {
                 }
                 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Version 2.0").font(.caption).foregroundColor(.secondary)
+                    Text("Version 2026.10.19").font(.caption).foregroundColor(.secondary)
                     Text("macOS WiFi Generator").font(.caption2).foregroundColor(.secondary)
                 }
                 .padding(.horizontal, 20).padding(.bottom, 20)
@@ -97,6 +99,7 @@ struct ContentView: View {
             Group {
                 switch selectedView {
                 case .generate: generateWiFiView
+                case .picker: emojiPickerView
                 case .scan: scanView
                 case .history: historyView
                 }
@@ -129,6 +132,9 @@ struct ContentView: View {
                         .foregroundColor(.white).padding(.horizontal, 24).padding(.vertical, 12)
                         .background(RoundedRectangle(cornerRadius: 8).fill(Color.accentColor))
                     }.buttonStyle(PlainButtonStyle())
+                    
+                    Toggle("Skip emojis I've already used", isOn: $skipUsedEmojis)
+                        .help("Random names avoid emojis that appear in your past network names")
                     
                     Button("Browse Combinations") { showCombinations = true }
                         .buttonStyle(.bordered)
@@ -197,6 +203,14 @@ struct ContentView: View {
         }
         .onChange(of: generatedWiFiName) { _ in if !generatedPassword.isEmpty { generateQRCode() } }
         .onChange(of: generatedPassword) { _ in if !generatedWiFiName.isEmpty { generateQRCode() } }
+    }
+    
+    // MARK: - Emoji Picker View
+    private var emojiPickerView: some View {
+        EmojiPickerView(usedEmojis: usedEmojis) { name in
+            finalizeSelection(name: name, description: "Custom emoji name")
+            selectedView = .generate
+        }
     }
     
     // MARK: - Scan View
@@ -312,7 +326,7 @@ struct ContentView: View {
                             Text(combo.name).font(.caption).foregroundColor(.secondary)
                         }
                         .padding(10).background(Color.gray.opacity(0.05)).cornerRadius(8)
-                        .onTapGesture { generatedWiFiName = combo.emojis; generatedDescription = combo.name; copyToClipboard(combo.emojis); showCombinations = false; selectedView = .generate }
+                        .onTapGesture { finalizeSelection(name: combo.emojis, description: combo.name); copyToClipboard(combo.emojis); showCombinations = false; selectedView = .generate }
                     }
                 }.padding()
             }
@@ -331,13 +345,17 @@ struct ContentView: View {
     }
     
     // MARK: - Helpers
+    private var usedEmojis: Set<String> {
+        EmojiWiFiGenerator.findUsedEmojis(in: historyManager.entries.map { $0.wifiName })
+    }
+    
     private var filteredCombinations: [(name: String, emojis: String)] {
         searchText.isEmpty ? EmojiWiFiGenerator.getAllCombinations() :
             EmojiWiFiGenerator.getAllCombinations().filter { $0.name.lowercased().contains(searchText.lowercased()) || $0.emojis.contains(searchText) }
     }
     
     private func iconForTab(_ tab: ViewTab) -> String {
-        switch tab { case .generate: return "sparkles"; case .scan: return "qrcode.viewfinder"; case .history: return "clock.arrow.circlepath" }
+        switch tab { case .generate: return "sparkles"; case .picker: return "face.smiling"; case .scan: return "qrcode.viewfinder"; case .history: return "clock.arrow.circlepath" }
     }
     
     private func badgeColor(_ source: String) -> Color {
@@ -370,20 +388,27 @@ struct ContentView: View {
     }
     
     private func generateWiFiName() {
+        let used = skipUsedEmojis ? usedEmojis : []
         switch selectedStyle {
         case .combination:
             let combo = EmojiWiFiGenerator.getRandomCombination()
-            generatedWiFiName = combo.emojis; generatedDescription = combo.name
+            finalizeSelection(name: combo.emojis, description: combo.name)
         case .single:
-            generatedWiFiName = EmojiWiFiGenerator.generateSingleEmojiWiFiName()
-            generatedDescription = EmojiWiFiGenerator.getSingleEmojiDescription(generatedWiFiName)
+            let emoji = EmojiWiFiGenerator.generateSingleEmojiWiFiName(excluding: used)
+            finalizeSelection(name: emoji, description: EmojiWiFiGenerator.getSingleEmojiDescription(emoji))
         case .random:
-            generatedWiFiName = EmojiWiFiGenerator.generateRandomLengthEmojiWiFiName()
-            generatedDescription = "Random combination of \(generatedWiFiName.count) emojis"
+            let name = EmojiWiFiGenerator.generateRandomLengthEmojiWiFiName(excluding: used)
+            finalizeSelection(name: name, description: "Random combination of emojis")
         }
+    }
+    
+    /// Applies a chosen name: fresh password, QR code, and a history entry.
+    private func finalizeSelection(name: String, description: String) {
+        generatedWiFiName = name
+        generatedDescription = description
         generatedPassword = PasswordGenerator.generateWiFiPassword(length: Int(passwordLength), includeUppercase: includeUppercase, includeLowercase: includeLowercase, includeNumbers: includeNumbers, includeSpecialChars: includeSpecialChars)
         generateQRCode()
-        historyManager.addEntry(wifiName: generatedWiFiName, password: generatedPassword, description: generatedDescription, source: "generated")
+        historyManager.addEntry(wifiName: name, password: generatedPassword, description: description, source: "generated")
     }
     
     private func generateQRCode() {

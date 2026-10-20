@@ -15,8 +15,14 @@ let package = Package(
             path: "Sources/EmojiWifi",
             resources: [
                 .copy("single.csv"),
-                .copy("combos.csv")
-            ],
+                .copy("combos.csv"),
+                .copy("EmojiCatalog.json")
+            ]
+        ),
+        .testTarget(
+            name: "EmojiWifiTests",
+            dependencies: [.target(name: "EmojiWifi")],
+            path: "Tests/EmojiWifiTests"
         )
     ]
 )

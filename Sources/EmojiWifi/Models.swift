@@ -5,23 +5,36 @@ import CoreImage
 
 // MARK: - Password Generator
 class PasswordGenerator {
+    private static let lowerCase = "abcdefghijklmnopqrstuvwxyz"
+    private static let upperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    private static let digits = "0123456789"
+    private static let special = "!@#$%^&*()_+-=[]{}|:.,<>?;"
+
+    /// Mirrors the Windows app: length clamped to 8–63, at least one
+    /// character from every selected class, rest from the union, shuffled.
     static func generateWiFiPassword(length: Int = 62, includeUppercase: Bool = true, includeLowercase: Bool = true, includeNumbers: Bool = true, includeSpecialChars: Bool = true) -> String {
-        var characters = ""
-        if includeLowercase { characters += "abcdefghijklmnopqrstuvwxyz" }
-        if includeUppercase { characters += "ABCDEFGHIJKLMNOPQRSTUVWXYZ" }
-        if includeNumbers { characters += "0123456789" }
-        if includeSpecialChars { characters += "!@#$%^&*()_+-=[]{}|<>?" }
-        guard !characters.isEmpty else { return "" }
-        var password = ""
-        for _ in 0..<length { password += String(characters.randomElement()!) }
-        return password
+        let clampedLength = min(max(length, 8), 63)
+        var classes: [String] = []
+        if includeLowercase { classes.append(lowerCase) }
+        if includeUppercase { classes.append(upperCase) }
+        if includeNumbers { classes.append(digits) }
+        if includeSpecialChars { classes.append(special) }
+        guard !classes.isEmpty else { return "" }
+
+        var chars: [Character] = classes.map { $0.randomElement()! }
+        let union = classes.joined()
+        while chars.count < clampedLength {
+            chars.append(union.randomElement()!)
+        }
+        chars.shuffle()
+        return String(chars)
     }
 }
 
 // MARK: - QR Code Generator
 class QRCodeGenerator {
     static func generateWiFiQRCode(ssid: String, password: String) -> NSImage? {
-        let wifiString = "WIFI:T:WPA;S:\(ssid);P:\(password);H:false;;"
+        let wifiString = WiFiQRPayload.build(ssid: ssid, password: password)
         let context = CIContext()
         let filter = CIFilter.qrCodeGenerator()
         filter.message = Data(wifiString.utf8)
@@ -31,23 +44,9 @@ class QRCodeGenerator {
         guard let cgImage = context.createCGImage(scaledImage, from: scaledImage.extent) else { return nil }
         return NSImage(cgImage: cgImage, size: NSSize(width: 300, height: 300))
     }
-    
+
     static func parseWiFiQRCode(_ qrString: String) -> (ssid: String?, password: String?) {
-        var ssid: String?
-        var password: String?
-        if let ssidRange = qrString.range(of: "S:") {
-            let startIndex = ssidRange.upperBound
-            if let endIndex = qrString.range(of: ";", range: startIndex..<qrString.endIndex) {
-                ssid = String(qrString[startIndex..<endIndex.lowerBound])
-            }
-        }
-        if let passwordRange = qrString.range(of: "P:") {
-            let startIndex = passwordRange.upperBound
-            if let endIndex = qrString.range(of: ";", range: startIndex..<qrString.endIndex) {
-                password = String(qrString[startIndex..<endIndex.lowerBound])
-            }
-        }
-        return (ssid, password)
+        return WiFiQRPayload.parse(qrString)
     }
 }
 
@@ -95,20 +94,35 @@ struct WiFiHistoryEntry: Identifiable, Codable, Equatable {
 }
 
 class HistoryManager: ObservableObject {
+    static let maxEntries = 50
+
     @Published var entries: [WiFiHistoryEntry] = []
-    
+
+    private let directory: URL?
+
     private var fileURL: URL {
-        let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-        let appDir = appSupport.appendingPathComponent("EmojiWifi")
+        let appDir: URL
+        if let custom = directory {
+            appDir = custom
+        } else {
+            let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+            appDir = appSupport.appendingPathComponent("EmojiWifi")
+        }
         try? FileManager.default.createDirectory(at: appDir, withIntermediateDirectories: true)
         return appDir.appendingPathComponent("history.json")
     }
-    
-    init() { load() }
-    
+
+    init(directory: URL? = nil) {
+        self.directory = directory
+        load()
+    }
+
     func addEntry(wifiName: String, password: String, description: String, source: String) {
         let entry = WiFiHistoryEntry(wifiName: wifiName, password: password, description: description, source: source)
         entries.insert(entry, at: 0)
+        if entries.count > HistoryManager.maxEntries {
+            entries.removeLast(entries.count - HistoryManager.maxEntries)
+        }
         save()
     }
     

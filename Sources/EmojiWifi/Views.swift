@@ -129,9 +129,9 @@ struct ImportQRCodeImageView: View {
                         HStack { Text("Password:").foregroundColor(.secondary); Spacer(); Text(pw).font(.system(.body, design: .monospaced)) }.padding(.horizontal)
                     }
                     Button("Use This WiFi") {
-                        if let s = scannedSSID, let p = scannedPassword {
-                            onQRCodeScanned("WIFI:T:WPA;S:\(s);P:\(p);H:false;;")
-                        } else { onQRCodeScanned(scannedCode) }
+                        // Pass the scanned payload through verbatim; parseWiFiQRCode
+                        // downstream handles escaping correctly.
+                        onQRCodeScanned(scannedCode)
                     }.buttonStyle(.borderedProminent)
                 }
                 .padding().background(Color.green.opacity(0.1)).cornerRadius(12).frame(maxWidth: 500)
@@ -187,9 +187,9 @@ struct LiveScanQRCodeView: View {
                         HStack { Text("Password:").foregroundColor(.secondary); Spacer(); Text(pw).font(.system(.body, design: .monospaced)) }.padding(.horizontal)
                     }
                     Button("Use This WiFi") {
-                        if let s = scannedSSID, let p = scannedPassword {
-                            onQRCodeScanned("WIFI:T:WPA;S:\(s);P:\(p);H:false;;")
-                        } else { onQRCodeScanned(scannedCode) }
+                        // Pass the scanned payload through verbatim; parseWiFiQRCode
+                        // downstream handles escaping correctly.
+                        onQRCodeScanned(scannedCode)
                     }.buttonStyle(.borderedProminent)
                 }
                 .padding().background(Color.green.opacity(0.1)).cornerRadius(12).frame(maxWidth: 500)
@@ -203,7 +203,7 @@ struct LiveScanQRCodeView: View {
                 scannedCode = qrString
                 let (ssid, pw) = QRCodeGenerator.parseWiFiQRCode(qrString)
                 scannedSSID = ssid; scannedPassword = pw; showingCamera = false
-                if let s = ssid, let p = pw { onQRCodeScanned("WIFI:T:WPA;S:\(s);P:\(p);H:false;;") }
+                onQRCodeScanned(qrString)
             })
         }
     }

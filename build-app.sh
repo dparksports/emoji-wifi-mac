@@ -7,9 +7,11 @@ APP_DIR="${APP_NAME}.app"
 
 # CLT 27.0's macOS 27 SDK implements SwiftUI's @State etc. as macros, but the
 # CLT (unlike full Xcode) doesn't ship the SwiftUIMacros plugin, so SwiftUI
-# fails to compile against it. Build against the last SDK that still uses
+# fails to compile against it. Only when building with the CLT (not full
+# Xcode, which has the plugin), fall back to the last SDK that still uses
 # plain property wrappers. Remove this once CLT ships the macro plugin.
-if [ -z "$SDKROOT" ] && [ -d "/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk" ]; then
+if [ -z "$SDKROOT" ] && [ -d "/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk" ] \
+    && [[ "$(xcode-select -p)" == *CommandLineTools* ]]; then
     export SDKROOT="/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk"
 fi
 
@@ -62,9 +64,9 @@ cat > "$APP_DIR/Contents/Info.plist" << 'PLIST'
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
-    <string>2.1.1</string>
+    <string>2026.10.19</string>
     <key>CFBundleVersion</key>
-    <string>2</string>
+    <string>3</string>
     <key>LSMinimumSystemVersion</key>
     <string>13.0</string>
     <key>NSCameraUsageDescription</key>
@@ -82,8 +84,15 @@ cat > "$APP_DIR/Contents/Info.plist" << 'PLIST'
 PLIST
 
 # Sign the app bundle
-echo "🔐 Signing app bundle..."
+echo "🔐 Signing app bundle (ad-hoc — not notarized; see README for first-launch notes)..."
 codesign --force --sign - "$APP_DIR"
+
+# Optional DMG: ./build-app.sh --dmg
+if [ "$1" == "--dmg" ]; then
+    echo "📀 Creating ${APP_NAME}.dmg..."
+    hdiutil create -volname "${APP_NAME}" -srcfolder "${APP_DIR}" -ov -format UDZO "${APP_NAME}.dmg" -quiet
+    echo "   ${APP_NAME}.dmg ready"
+fi
 
 echo ""
 echo "✅ Built successfully: ${APP_DIR}"
